@@ -6,8 +6,8 @@ else: import osproc
 type
   Backend = enum C = "c", Cc = "cc", Cpp = "cpp", Objc = "objc", Js = "js"
   VersionSelector = enum
-    SmallerThan = "<", LargerThan = ">", LargerOrEqual = ">=",
-    SmallerOrEqual = "<=", Equal = "==", Semver = "^=", Similar = "~=",
+    Equal = "==", SmallerThan = "<", LargerThan = ">", LargerOrEqual = ">=",
+    SmallerOrEqual = "<=", Semver = "^=", Similar = "~=",
     Any = "any"
   Version = object
     major: int
