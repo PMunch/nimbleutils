@@ -1,4 +1,4 @@
-import strutils, sequtils
+import std / [strutils, sequtils, os, compilesettings]
 
 when nimvm: discard
 else: import osproc
@@ -129,3 +129,33 @@ proc getPackage*(package: string): NimblePkg =
     of "requires": result.requires = parseDependencies(value)
     else: raise newException(KeyError, "Unknown key in Nimble package dump: " & key)
 
+proc getPackagePath*(file: string, relativeTo: string, useSearchPaths = true): string =
+  ## Gets the import path required for the given file. This checks nimble paths
+  ## and search paths given the `useSearchPaths` option, and falls back to a
+  ## path relative to the `relativeTo` path. The template overload without
+  ## `relativeTo` will automatically grab the source file `getPackagePath` is
+  ## called from and get the import path relative to that.
+  let
+    nimblePaths = block:
+      let paths = querySettingSeq(nimblePaths)
+      if paths.len == 0: paths
+      else: paths.mapIt(it.strip(leading = false, chars = {DirSep}))
+    searchPaths = block:
+      let paths = querySettingSeq(searchPaths)
+      if paths.len == 0: paths
+      else: paths.mapIt(it.strip(leading = false, chars = {DirSep}))
+  var folder = file.parentDir()
+  while folder.len != 0:
+    try:
+      let package = folder.getPackage()
+      if not useSearchPaths or folder in searchPaths or folder.parentDir in nimblePaths:
+        return file.relativePath(folder).changeFileExt("")
+    except: discard
+    folder = folder.parentDir()
+  return file.relativePath(relativeTo.parentDir()).changeFileExt("")
+
+template getPackagePath*(file: string, useSearchPaths = true): string =
+  ## Calls `getPackagePath` with `relativeTo` set to the file this is called
+  ## from.
+  const path = instantiationInfo(fullPaths = true)
+  getPackagePath(file, path.filename, useSearchPaths)
