@@ -4,44 +4,44 @@ when nimvm: discard
 else: import osproc
 
 type
-  Backend = enum C = "c", Cc = "cc", Cpp = "cpp", Objc = "objc", Js = "js"
-  VersionSelector = enum
+  Backend* = enum C = "c", Cc = "cc", Cpp = "cpp", Objc = "objc", Js = "js"
+  VersionSelector* = enum
     Equal = "==", SmallerThan = "<", LargerThan = ">", LargerOrEqual = ">=",
     SmallerOrEqual = "<=", Semver = "^=", Similar = "~=",
     Any = "any"
-  Version = object
-    major: int
-    minor: int
-    patch: int
-    extras: seq[int]
-    tag: string
-  Dependency = object
-    name: string
-    version: Version
-    versionSelector: VersionSelector
+  Version* = object
+    major*: int
+    minor*: int
+    patch*: int
+    extras*: seq[int]
+    tag*: string
+  Dependency* = object
+    name*: string
+    version*: Version
+    versionSelector*: VersionSelector
   NimblePkg = object
-    name: string
-    version: Version
-    author: string
-    description: string
-    license: string
-    skipDirs: seq[string]
-    skipFiles: seq[string]
-    skipExt: seq[string]
-    installDirs: seq[string]
-    installFiles: seq[string]
-    installExt: seq[string]
-    srcDir: string
-    binDir: string
-    bin: seq[tuple[name, sourceName: string]]
-    backend: Backend
-    requires: seq[Dependency]
+    name*: string
+    version*: Version
+    author*: string
+    description*: string
+    license*: string
+    skipDirs*: seq[string]
+    skipFiles*: seq[string]
+    skipExt*: seq[string]
+    installDirs*: seq[string]
+    installFiles*: seq[string]
+    installExt*: seq[string]
+    srcDir*: string
+    binDir*: string
+    bin*: seq[tuple[name, sourceName: string]]
+    backend*: Backend
+    requires*: seq[Dependency]
 
 proc nimbleDump(package: string): tuple[output: string, exitCode: int] =
   when nimvm:
-    gorgeEx("nimble dump " & package)
+    gorgeEx("nimble dump " & quoteShell(package))
   else:
-    execCmdEx("nimble dump " & package)
+    execCmdEx("nimble dump " & quoteShell(package))
 
 proc parseVersion(version: string): Version =
   let split = version.split(".")
