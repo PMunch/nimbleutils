@@ -1,7 +1,10 @@
 import std / [strutils, sequtils, os, compilesettings]
 
 when nimvm: discard
-else: import osproc
+else:
+  when not defined(freertos):
+    # can't import osproc when cross-compiling for freertos
+    import osproc
 
 type
   Backend* = enum C = "c", Cc = "cc", Cpp = "cpp", Objc = "objc", Js = "js"
@@ -41,7 +44,11 @@ proc nimbleDump(package: string): tuple[output: string, exitCode: int] =
   when nimvm:
     gorgeEx("nimble dump " & quoteShell(package))
   else:
-    execCmdEx("nimble dump " & quoteShell(package))
+    when not defined(freertos):
+      # can't import osproc when cross-compiling for freertos
+      execCmdEx("nimble dump " & quoteShell(package))
+    else:
+      gorgeEx("nimble dump " & quoteShell(package))
 
 proc parseVersion(version: string): Version =
   let split = version.split(".")
