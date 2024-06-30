@@ -39,6 +39,7 @@ type
     bin*: seq[tuple[name, sourceName: string]]
     backend*: Backend
     requires*: seq[Dependency]
+    paths*: seq[string]
 
 proc nimbleDump(package: string): tuple[output: string, exitCode: int] =
   when nimvm:
@@ -134,6 +135,7 @@ proc getPackage*(package: string): NimblePkg =
     of "namedBin": result.addNamedBins value
     of "backend": result.backend = parseEnum[Backend](value)
     of "requires": result.requires = parseDependencies(value)
+    of "paths": result.paths = value.split(",").mapIt(it.strip)
     else: raise newException(KeyError, "Unknown key in Nimble package dump: " & key)
 
 proc getPackagePath*(file: string, relativeTo: string, useSearchPaths = true): string =
