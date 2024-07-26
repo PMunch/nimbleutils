@@ -40,6 +40,9 @@ type
     backend*: Backend
     requires*: seq[Dependency]
     paths*: seq[string]
+    nimblePath*: string
+    nimDir*: string
+    entryPoints*: seq[string]
 
 proc nimbleDump(package: string): tuple[output: string, exitCode: int] =
   when nimvm:
@@ -136,6 +139,9 @@ proc getPackage*(package: string): NimblePkg =
     of "backend": result.backend = parseEnum[Backend](value)
     of "requires": result.requires = parseDependencies(value)
     of "paths": result.paths = value.split(",").mapIt(it.strip)
+    of "nimblePath": result.nimblePath = value
+    of "nimDir": result.nimDir = value
+    of "entryPoints": result.entryPoints = value.split(",").mapIt(it.strip)
     else: raise newException(KeyError, "Unknown key in Nimble package dump: " & key)
 
 proc getPackagePath*(file: string, relativeTo: string, useSearchPaths = true): string =
