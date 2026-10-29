@@ -1,6 +1,6 @@
 # Package
 
-version       = "0.3.3"
+version       = "0.3.4"
 author        = "PMunch"
 description   = "A Nimble package to inspect Nimble packages"
 license       = "MIT"
